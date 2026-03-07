@@ -5,6 +5,8 @@
 #include "board/crc.h"
 #ifdef STM32H7
 #include "board/stm32h7/lladc_declarations.h"
+#elif defined(STM32F4)
+#include "board/stm32f4/lladc_declarations.h"
 #endif
 
 // ******************** bootkick ********************
@@ -122,8 +124,10 @@ void update_can_health_pkt(uint8_t can_number, uint32_t ir_reg);
 void process_can(uint8_t can_number);
 void can_rx(uint8_t can_number);
 bool can_init(uint8_t can_number);
+#endif
 
 // ******************** harness ********************
+#if defined(STM32H7) || defined(STM32F4)
 
 #define HARNESS_STATUS_NC 0U
 #define HARNESS_STATUS_NORMAL 1U
@@ -189,7 +193,7 @@ void handle_interrupt(IRQn_Type irq_type);
 void interrupt_timer_handler(void);
 void init_interrupts(bool check_rate_limit);
 
-#endif // STM32H7
+#endif // STM32H7 || STM32F4
 
 // ******************** registers ********************
 
@@ -226,7 +230,11 @@ void simple_watchdog_init(uint32_t fault, uint32_t threshold);
 // in a tight loop, plus some buffer
 #define SPI_IRQ_RATE  16000U
 
-#define SPI_BUF_SIZE 4096U
+#ifdef STM32H7
+  #define SPI_BUF_SIZE 4096U
+#else
+  #define SPI_BUF_SIZE 1024U
+#endif
 extern uint8_t spi_buf_rx[SPI_BUF_SIZE];
 extern uint8_t spi_buf_tx[SPI_BUF_SIZE];
 
@@ -238,7 +246,7 @@ void spi_rx_done(void);
 void spi_tx_done(bool reset);
 
 // ******************** uart ********************
-#ifdef STM32H7
+#if defined(STM32H7) || defined(STM32F4)
 
 // ***************************** Definitions *****************************
 #define FIFO_SIZE_INT 0x400U
@@ -278,7 +286,7 @@ static void puth4(unsigned int i);
 static void hexdump(const void *a, int l);
 #endif
 
-#endif // STM32H7
+#endif // STM32H7 || STM32F4
 
 // ******************** usb ********************
 
