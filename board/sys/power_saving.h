@@ -52,6 +52,9 @@ void set_power_save_state(bool enable) {
   }
 }
 
+#ifdef STM32F4
+static void enter_stop_mode(void) {}
+#else
 static void enter_stop_mode(void) {
   // set all GPIO to analog mode to reduce power, analog mode also disables pull resistors
   register_set(&(GPIOA->MODER), 0xFFFFFFFFU, 0xFFFFFFFFU);
@@ -146,3 +149,4 @@ static void enter_stop_mode(void) {
 
   NVIC_SystemReset();
 }
+#endif
